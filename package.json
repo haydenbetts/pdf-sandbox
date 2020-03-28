@@ -1,0 +1,17 @@
+{
+  "name": "pdf-sandbox-monorepo",
+  "private": true,
+  "scripts": {
+    "start": "lerna run start --parallel",
+    "start:hooks": "lerna run start --scope @pdf-sandbox/frontend --scope @pdf-sandbox/paged-js --parallel",
+    "setup": "npx lerna bootstrap"
+  },
+  "devDependencies": {
+    "lerna": "^3.10.2"
+  },
+  "workspaces": {
+    "packages": [
+      "packages/*"
+    ]
+  }
+}
