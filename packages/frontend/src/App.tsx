@@ -1,24 +1,19 @@
 import React from 'react';
 import logo from './logo.svg';
 import './App.css';
-import  * as Paged from '@pdf-sandbox/paged-js';
-
-console.log(Paged.Previewer)
+import { BrowserRouter as Router, Route } from 'react-router-dom';
+import Theme from './Theme';
+import Layout from './Layout';
 
 function App() {
   return (
+
     <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+      <Theme>
+        <Router>
+          <Route exact path = "/" component={Layout} />
+        </Router>
+      </Theme>
     </div>
   );
 }

@@ -217,7 +217,8 @@ class RunningHeaders extends Handler {
 
 	beforeTreeParse(text, sheet) {
 		// element(x) is parsed as image element selector, so update element to element-ident
-		sheet.text = text.replace(/element[\s]*\(([^|^#)]*)\)/g, "element-ident($1)");
+
+		sheet.text = text && text.replace(/element[\s]*\(([^|^#)]*)\)/g, "element-ident($1)");
 	}
 }
 
