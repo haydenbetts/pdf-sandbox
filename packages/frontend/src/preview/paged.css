@@ -31,7 +31,7 @@
       flex-wrap: wrap;
       justify-content: flex-start;
       transform-origin: top;
-      transform: scale(.5);
+      transform: scale(.5) translate(100px, 0px);
       margin: 0 auto;
     }
   

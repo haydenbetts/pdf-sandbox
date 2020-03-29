@@ -7,6 +7,7 @@ class Polisher {
 	constructor(setup) {
 		this.sheets = [];
 		this.inserted = [];
+		this.init = false;
 
 		this.hooks = {};
 		this.hooks.onUrl = new Hook(this);
@@ -29,8 +30,19 @@ class Polisher {
 		}
 	}
 
+	// cleanup() {
+	// 	const old = document.querySelectorAll("style[data-pagedjs-inserted-styles=\"true\"]");
+	// 	Array.from(old).forEach((node) => {
+	// 		if (!node.getAttribute("data-pagedjs-basestyles")) node.remove();
+	// 	});
+	// }
+
 	setup() {
-		this.base = this.insert(baseStyles);
+		// this.cleanup();
+		if (!this.init) {
+			this.base = this.insert(baseStyles, true);
+			this.init = true;
+		}
 		this.styleEl = document.createElement("style");
 		document.head.appendChild(this.styleEl);
 		this.styleSheet = this.styleEl.sheet;
@@ -73,13 +85,14 @@ class Polisher {
 		// 		return text;
 		// 	});
 		return (async () => {
-			this.insert(await this.convertViaSheet(css, "http://localhost:3000"));
+			this.insert(await this.convertViaSheet(css, ""));
 			return css;
 		})();
 	}
 
 	async convertViaSheet(cssStr, href) {
 		let sheet = new Sheet(href, this.hooks);
+		console.log("CSSSTRRRRR", cssStr);
 		await sheet.parse(cssStr);
 
 		// Insert the imported sheets first
@@ -102,14 +115,17 @@ class Polisher {
 		if (typeof sheet.orientation !== "undefined") {
 			this.orientation = sheet.orientation;
 		}
+
+		console.log(sheet.toString());
 		return sheet.toString();
 	}
 
-	insert(text){
+	insert(text, base){
 		let head = document.querySelector("head");
 		let style = document.createElement("style");
 		style.type = "text/css";
 		style.setAttribute("data-pagedjs-inserted-styles", "true");
+		if (base) style.setAttribute("data-pagedjs-basestyles", "true");
 
 		style.appendChild(document.createTextNode(text));
 
@@ -120,10 +136,16 @@ class Polisher {
 	}
 
 	destroy() {
-		this.styleEl.remove();
+		try {
+			this.styleEl.remove();
+		} catch(err) {
+
+		}
 		this.inserted.forEach((s) => {
 			s.remove();
 		});
+
+		this.inserted = [];
 		this.sheets = [];
 	}
 }

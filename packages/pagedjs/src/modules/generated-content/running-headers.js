@@ -171,7 +171,7 @@ class RunningHeaders extends Handler {
 				}
 				break;
 			default:
-				if (parts[0].indexOf(":nth-of-type") > -1) {
+				if (parts[0] && parts[0].indexOf(":nth-of-type") > -1) {
 					weight = 4;
 				} else {
 					weight = 1;

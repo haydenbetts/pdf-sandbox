@@ -1,6 +1,7 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { createStyles, withStyles } from '@material-ui/core/styles';
 import Grid from '@material-ui/core/Grid';
+import sanitizeHtml from 'sanitize-html';
 
 import Header from './Header';
 import Sidebar from './sidebar'
@@ -42,11 +43,46 @@ const dHTML =
 
 
 const Layout = ({classes}: LayoutProps) => {
-    const [state, setState] = useState({
+    const persisted = localStorage.getItem('state');
+    console.log('persisted', persisted)
+    const [state, setState] = useState(persisted ? JSON.parse(persisted) : {
         name: 'Untitled PDF',
         html: dHTML,
         css: dCSS,
     })
+
+    const setHTML = (html: string) => {
+        console.log('sanitizeHtml(html)', sanitizeHtml(html, {
+            allowedTags: [ 'h3', 'h4', 'h5', 'h6', 'blockquote', 'p', 'a', 'ul', 'ol',
+            'nl', 'li', 'b', 'i', 'strong', 'em', 'strike', 'code', 'hr', 'br', 'div',
+            'table', 'thead', 'caption', 'tbody', 'tr', 'th', 'td', 'pre', 'iframe', 'img', 'table', 'link' ],
+            allowedAttributes: {
+                div: ['class'],
+                img: ['href']
+            }
+        }))
+        setState({...state, html: sanitizeHtml(html, {
+            allowedTags: [ 'h3', 'h4', 'h5', 'h6', 'blockquote', 'p', 'a', 'ul', 'ol',
+            'nl', 'li', 'b', 'i', 'strong', 'em', 'strike', 'code', 'hr', 'br', 'div',
+            'table', 'thead', 'caption', 'tbody', 'tr', 'th', 'td', 'pre', 'iframe', 'img', 'link' ],
+            allowedAttributes: {
+                img: ['href', 'src'],
+                '*': [ 'style', 'class', 'align', 'alt', 'center', 'bgcolor', 'href' ]
+            }
+        })});
+    }
+
+    const setCSS = (css: string) => {
+        console.log('css', css)
+        setState({...state, css: sanitizeHtml(css)});
+    }
+
+    console.log('state', state)
+
+
+    useEffect(() => {
+        localStorage.setItem('state', JSON.stringify(state));
+    }, [state])
 
     return (
         <div style={{maxHeight: '100vh', overflow: 'hidden'}}>
@@ -54,7 +90,7 @@ const Layout = ({classes}: LayoutProps) => {
             <Grid container direction="row" style={{flexWrap: 'nowrap'}}>
                 <Sidebar></Sidebar>
                 <Grid item style={{width: '50%'}}>
-                 <Editor parentSet={setState} parentState={state}/>
+                 <Editor setHTML={setHTML} setCSS={setCSS} parentState={state}/>
                 </Grid>
                 <Grid item style={{width: '50%', overflow: 'scroll'}}>
                     <Preview html={state.html} css={state.css}/>

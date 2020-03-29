@@ -44,6 +44,8 @@ class Previewer {
 		this.chunker.on("rendering", () => {
 			this.emit("rendering", this.chunker);
 		});
+
+		this.first = true;
 	}
 
 	initializeHandlers() {
@@ -120,14 +122,13 @@ class Previewer {
 	}
 
 	async preview(content, css, renderTo) {
-
 		await this.hooks.beforePreview.trigger(content, renderTo);
 
 		if (!content) {
 			content = this.wrapContent();
 		}
 
-		this.polisher.setup();
+		this.polisher.setup(this.first);
 
 		this.handlers = this.initializeHandlers();
 
@@ -147,6 +148,7 @@ class Previewer {
 
 		await this.hooks.afterPreview.trigger(flow.pages);
 
+		this.first = false;
 		return flow;
 	}
 }

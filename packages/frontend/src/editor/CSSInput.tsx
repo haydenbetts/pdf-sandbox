@@ -1,8 +1,10 @@
-import React from 'react';
+import React, { useState, useEffect} from 'react';
 import ReactEditor from "react-ace"
 
 import "ace-builds/src-noconflict/mode-css";
 import "ace-builds/src-noconflict/theme-github";
+
+import UseDebounce from '../hooks/UseDebounce';
 
 type CSSProps = {
     setCSS: Function,
@@ -11,30 +13,18 @@ type CSSProps = {
 
 const Editor = (props : CSSProps) => {
   
+  const [state, setState] = useState(props.css);
+  const debouncedState = UseDebounce(state, 500);
+
+  useEffect(() => {
+    props.setCSS(state);
+  }, [debouncedState])
+
     const editorProps = {
       mode: 'css',
-      value: props.css,
+      value: state,
       theme: "github",
-      onChange: (val: string) => props.setCSS(val,  
-        {
-            "indent_size": 4,
-            "html": {
-                "end_with_newline": true,
-                "js": {
-                    "indent_size": 2
-                },
-                "css": {
-                    "indent_size": 2
-                }
-            },
-            "css": {
-                "indent_size": 1
-            },
-            "js": {
-               "preserve-newlines": true
-            }
-        }
-        ),
+      onChange: (val: string) => setState(val),
       name: 'id',
       fontSize: 12,
       height: '100vh',

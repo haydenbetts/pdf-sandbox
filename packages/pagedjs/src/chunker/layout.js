@@ -79,6 +79,8 @@ class Layout {
 				this.hooks && this.hooks.layout.trigger(wrapper, this);
 
 				let imgs = wrapper.querySelectorAll("img");
+				console.log("wrapper", wrapper);
+				console.log(">><>>>", imgs);
 				if (imgs.length) {
 					await this.waitForImages(imgs);
 				}
@@ -231,6 +233,7 @@ class Layout {
 	}
 
 	async awaitImageLoaded(image) {
+		if (!image.src) return;
 		return new Promise(resolve => {
 			if (image.complete !== true) {
 				image.onload = function() {
@@ -288,10 +291,10 @@ class Layout {
 					// Check if temp is the last rendered node at its level.
 					if (!temp.nextSibling) {
 						// We need to ensure that the previous sibling of temp is fully rendered.
-						const renderedNodeFromSource = findElement(renderedNode, source)
-						const walker = document.createTreeWalker(renderedNodeFromSource, NodeFilter.SHOW_ELEMENT)
-						const lastChildOfRenderedNodeFromSource = walker.lastChild()
-						const lastChildOfRenderedNodeMatchingFromRendered = findElement(lastChildOfRenderedNodeFromSource, rendered)
+						const renderedNodeFromSource = findElement(renderedNode, source);
+						const walker = document.createTreeWalker(renderedNodeFromSource, NodeFilter.SHOW_ELEMENT);
+						const lastChildOfRenderedNodeFromSource = walker.lastChild();
+						const lastChildOfRenderedNodeMatchingFromRendered = findElement(lastChildOfRenderedNodeFromSource, rendered);
 						// Check if we found that the last child in source 
 						if (!lastChildOfRenderedNodeMatchingFromRendered) {
 							// Pending content to be rendered before virtual break token

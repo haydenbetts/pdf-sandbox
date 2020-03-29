@@ -527,6 +527,7 @@ class AtPage extends Handler {
 		return padding;
 	}
 	addPageClasses(pages, ast, sheet) {
+		console.log("pages", pages);
 		// First add * page
 		if ("*" in pages) {
 			let p = this.createPage(pages["*"], ast.children, sheet);
@@ -577,6 +578,8 @@ class AtPage extends Handler {
 			loc: 0,
 			children: children
 		};
+		console.log("sheet", sheet);
+		console.trace();
 		let rule = this.createRule(selectors, block);
 
 		this.addMarginVars(page.margin, children, children.first());

@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import ReactEditor from "react-ace"
 import beautify from 'js-beautify';
 
@@ -7,6 +7,8 @@ import "ace-builds/src-noconflict/theme-github";
 
 import prettier from "prettier/standalone";
 import parserHTML from "prettier/parser-html";
+
+import UseDebounce from '../hooks/UseDebounce';
 
 console.log(parserHTML)
 
@@ -18,23 +20,19 @@ type EditorProps = {
 
 
 const Editor = (props : EditorProps) => {
+
+  const [state, setState] = useState(props.html);
+  const debouncedState = UseDebounce(state, 500);
+  
+  useEffect(() => {
+    props.setHTML(state);
+  }, [debouncedState])
   
     const editorProps = {
       mode: 'html',
-      value: props.html,
+      value: state,
       theme: "github",
-      onChange: (val: string) => {
-
-
-        // console.log(
-        //   prettier.format(val, {
-        //     parser: "html",
-        //     plugins: [parserHTML],
-        //   })
-        // )
-
-        props.setHTML(val)
-       },
+      onChange: (val: string) => setState(val),
       name: 'id',
       fontSize: 12,
       showPrintMargin: false,

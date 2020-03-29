@@ -7,6 +7,7 @@ import Code from '@material-ui/icons/Code';
 
 import HTMLInput from './HTMLInput';
 import CSSInput from './CSSInput';
+import Tab from '../components/Tab';
 
 const styles = (theme: any) => 
   createStyles({
@@ -16,53 +17,13 @@ const styles = (theme: any) =>
     tab_row: {
         flexWrap: 'nowrap',
         backgroundColor: theme.palette.grey.one
-    },
-    tab_active: {
-        height: 40,
-        width: 250,
-        backgroundColor: '#ffffff',
-        color: theme.palette.primary.main,
-        alignItems: 'center',
-        position: 'relative',
-        zIndex: 10,
-        boxShadow: '3px 0px 0px 0px hsla(0, 0%, 0%, .1)',
-        cursor: 'pointer'
-    },
-    tab_inactive: {
-        height: 40,
-        width: 250,
-        backgroundColor: theme.palette.grey.four,
-        alignItems: 'center',
-        boxShadow: 'inset -1px 0px 2px 0px hsla(0, 0%, 0%, .1)',
-        cursor: 'pointer'
     }
   });
 
-
-type TabProps = {
-    classes: any,
-    active?: Boolean,
-    name: string,
-    tab: Tabs,
-    onClick: Function;
-}
-
-const Tab = withStyles(styles, { withTheme: true })(({ classes, active, name, tab, onClick } : TabProps) => {
-
-    return (
-    <Grid container direction="row" className={active ? classes.tab_active : classes.tab_inactive} onClick={() => onClick(tab)}>
-        <Box ml={2}></Box>
-        <Code fontSize="small"/>
-        <Box ml={1}></Box>
-        <Typography style={{fontWeight: 200}}>{name}</Typography>
-    </Grid>
-    )
-})
-
-
 type EditorProps = {
     classes: any;
-    parentSet: Function;
+    setCSS: Function
+    setHTML: Function;
     parentState: any;
 }
 
@@ -72,7 +33,7 @@ enum Tabs {
 }
 
 
-const Editor = ({ classes, parentSet, parentState } : EditorProps) => {
+const Editor = ({ classes, setCSS, setHTML, parentState } : EditorProps) => {
 
     const [state, setState] = useState({
         tab: Tabs.html,
@@ -94,17 +55,17 @@ const Editor = ({ classes, parentSet, parentState } : EditorProps) => {
         <div className={classes.editor}>
             <Grid container direction="row" className={classes.tab_row}>
                 <Grid item>
-                     <Tab active={state.tab === Tabs.html} name={state.files.html.name} tab={Tabs.html} onClick={onTabClick}/>
+                     <Tab active={state.tab === Tabs.html} name={state.files.html.name} tab={Tabs.html} onClick={onTabClick} Icon={Code}/>
                 </Grid>
                 <Grid item>
-                 <Tab active={state.tab === Tabs.css} name={state.files.css.name} tab={Tabs.css} onClick={onTabClick}/>
+                 <Tab active={state.tab === Tabs.css} name={state.files.css.name} tab={Tabs.css} onClick={onTabClick} Icon={Code}/>
                 </Grid>
             </Grid>
             <div style={{maxHeight: '90vh', overflow: 'scroll'}}>
                 {state.tab === Tabs.html ? (
-                    <HTMLInput html={parentState.html} setHTML={(html: string) => parentSet({...state, html})}/>
+                    <HTMLInput html={parentState.html} setHTML={setHTML}/>
                 ) : (
-                    <CSSInput css={parentState.css} setCSS={(css: string) => parentSet({...state, css})}/>
+                    <CSSInput css={parentState.css} setCSS={setCSS}/>
                 )}
             </div>
         </div>

@@ -1,7 +1,11 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { createStyles, withStyles } from '@material-ui/core/styles';
-import Grid from '@material-ui/core/Grid';
+import {Grid, IconButton, Box} from '@material-ui/core';
+import PictureAsPdf from '@material-ui/icons/PictureAsPdf';
+import GetApp from '@material-ui/icons/GetApp';
 import * as Paged from '@pdf-sandbox/paged-js';
+
+import Tab from '../components/Tab';
 
 const styles = (theme: any) => 
   createStyles({
@@ -16,6 +20,11 @@ const styles = (theme: any) =>
       backgroundColor: theme.palette.grey.one,
       overflow: 'scroll',
       height: 3000
+    },
+    subhead: {
+      height: 36,
+      width: '100%',
+      backgroundColor: '#ffffff'
     }
   });
 
@@ -27,12 +36,61 @@ const styles = (theme: any) =>
 
 let paged = new Paged.Previewer();
 
+enum Tabs {
+  pdf = 'pdf',
+}
 
 const Preview = ({ classes, html, css } : PreviewProps) => {
+
+  const [state, setState] = useState({
+    tab: Tabs.pdf,
+    settings: {
+      left_right: true
+    },
+    files: {
+      pdf: {
+        name: 'untitled.pdf'
+      }
+    }
+  })
+
   const preview = useRef(null);
 
+      const print = async () => {
+          /* eslint-disable */
+          var ifr = document.createElement('iframe');
+          // ifr.style='height: 0px; width: 0px; position: absolute'
+          
+          document.body.appendChild(ifr);
+        
+           var scr = ifr.contentDocument!.createElement("script");
+        
+          scr.type = "text/javascript";
+          scr.src = 'https://unpkg.com/pagedjs/dist/paged.polyfill.js'; // Use the IP       found above
+          ifr!.contentDocument!.head.appendChild(scr);
+
+          var style = ifr.contentDocument!.createElement("style");
+
+          ifr.contentDocument!.head.appendChild(style);
+          style.type = 'text/css';
+          style.appendChild(ifr.contentDocument!.createTextNode(css));
+
+          var body = ifr.contentDocument!.createElement("body");
+          body.innerHTML = html;
+
+          ifr.contentDocument!.body = body;
+
+          await new Promise ((resolve) => setTimeout(resolve, 500));
+          ifr!.contentWindow!.print();
+
+          document.body.removeChild(ifr);
+        }
    useEffect(() => {
         if (preview.current && paged) {
+            if (paged.polisher) {
+              paged.polisher.destroy();
+              paged.polisher = new Paged.Polisher(false);
+            }
 
             const placeholder = document.createElement('div');
             placeholder.innerHTML = html;
@@ -40,7 +98,7 @@ const Preview = ({ classes, html, css } : PreviewProps) => {
               const container = document.querySelector('.pagedjs_pages');
               if (container) {
                 (container as any).style.transformOrigin = 'top';
-                (container as any).style.transform = 'scale(.5)';
+                (container as any).style.transform = 'scale(.5) translate(0px, 100px)';
               }
               const pages = Array.from(document.querySelectorAll('.pagedjs_page'));
               pages.forEach((page) => {
@@ -53,7 +111,24 @@ const Preview = ({ classes, html, css } : PreviewProps) => {
     
   return (
     <div className={classes.bg}>
-      <Grid className={classes.header}></Grid>
+      <Grid className={classes.header}>
+        <Tab active={state.tab === Tabs.pdf} name={state.files.pdf.name} tab={Tabs.pdf} onClick={() => {}} Icon={PictureAsPdf}/>
+        <Grid className={classes.subhead} container alignItems="center" justify="space-between">
+          <Grid item container style={{width: 'unset'}}>
+          <Box ml={1}>
+          <input type="checkbox" id="scales" name="scales"checked={!state.settings.left_right} />
+          </Box>
+          <Box ml={1}>
+             Left/Right Pages
+          </Box>
+          </Grid>
+          <Box mr={2}>
+          <IconButton onClick={() => print()} size="small">
+            <GetApp fontSize="small"/>
+          </IconButton>
+          </Box>
+        </Grid>
+      </Grid>
      <div ref={preview}></div>
    </div>
   )
