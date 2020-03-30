@@ -1,7 +1,8 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { createStyles, withStyles } from '@material-ui/core/styles';
 import Grid from '@material-ui/core/Grid';
 import sanitizeHtml from 'sanitize-html';
+import Draggable from "react-draggable";
 
 import Header from './Header';
 import Sidebar from './sidebar'
@@ -13,6 +14,17 @@ const styles = (theme: any) =>
     header: {
         width: '100%',
         height: 50,
+        backgroundColor: theme.palette.grey.one
+    },
+    dragger: {
+        height: '100%',
+        cursor: 'ew-resize',
+        width: '15px',
+        backgroundColor: '#ffffff4d',
+        boxShadow: 'inset 0px -8px 2px 0px hsla(0, 0%, 0%, .1)'
+    },
+    spacer: {
+        height: '40px',
         backgroundColor: theme.palette.grey.one
     }
   });
@@ -49,7 +61,12 @@ const Layout = ({classes}: LayoutProps) => {
         name: 'Untitled PDF',
         html: dHTML,
         css: dCSS,
+        width: 50,
+        activeDrags: 0
     })
+    const [deltaPosition, setDeltaPosition] = useState({
+        x: 0, y: 0
+    });
 
     const setHTML = (html: string) => {
         console.log('sanitizeHtml(html)', sanitizeHtml(html, {
@@ -77,7 +94,24 @@ const Layout = ({classes}: LayoutProps) => {
         setState({...state, css: sanitizeHtml(css)});
     }
 
-    console.log('state', state)
+    const draggableExtent = useRef(null);
+
+    const dragHandlers = {
+        onStart: () => setState({...state, activeDrags: ++state.activeDrags}), 
+        onStop: () => setState({...state, activeDrags: --state.activeDrags}),
+        handleDrag: (e: any, ui: any) => {
+            console.log(state.width)
+            let inital = state.width + (ui.deltaX / 50);
+            if (inital < 20) inital = 20;
+            if (inital > 80) inital = 80;
+            setState({...state, width: inital})
+            // console.log('x', x);
+            setDeltaPosition({
+                x: 0,
+                y: 0
+              });
+        }
+    };
 
 
     useEffect(() => {
@@ -87,14 +121,22 @@ const Layout = ({classes}: LayoutProps) => {
     return (
         <div style={{maxHeight: '100vh', overflow: 'hidden'}}>
             <Header name={state.name}/>
-            <Grid container direction="row" style={{flexWrap: 'nowrap'}}>
+            <Grid id="outside" container direction="row" style={{flexWrap: 'nowrap'}}>
                 <Sidebar></Sidebar>
-                <Grid item style={{width: '50%'}}>
-                 <Editor setHTML={setHTML} setCSS={setCSS} parentState={state}/>
-                </Grid>
-                <Grid item style={{width: '50%', overflow: 'scroll'}}>
-                    <Preview html={state.html} css={state.css}/>
-                </Grid>
+                    <Grid item style={{width: `${state.width || 50}%`}}>
+                    <Editor setHTML={setHTML} setCSS={setCSS} parentState={state}/>
+                    </Grid>
+                    <div style={{position: 'relative'}}>
+                    <Draggable position={{x: 0, y: 0}} onStart={dragHandlers.onStart} onStop={dragHandlers.onStop} axis="x" onDrag={dragHandlers.handleDrag}>
+                        <div style={{position: 'absolute', opacity: 0, width: 15, height: '100%',  cursor: 'ew-resize'}}>
+                        </div>
+                    </Draggable>
+                         <div className={classes.spacer} ></div>
+                        <div className={classes.dragger}></div>
+                    </div>
+                    <Grid item style={{width: `${100 - state.width || 50}%`, overflow: 'scroll'}}>
+                        <Preview html={state.html} css={state.css}/>
+                    </Grid>
             </Grid>
         </div>
     )

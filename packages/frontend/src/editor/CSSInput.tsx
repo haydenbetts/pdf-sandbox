@@ -31,6 +31,7 @@ const Editor = (props : CSSProps) => {
       width: '100%',
       showPrintMargin: false,
       showGutter: false,
+      setAutoScrollEditorIntoView: true,
       highlightActiveLine: false,
       setOptions: {
         showLineNumbers: false,

@@ -16,6 +16,7 @@
   },
   "dependencies": {
     "@types/sanitize-html": "^1.22.0",
+    "react-draggable": "^4.2.0",
     "sanitize-html": "^1.22.1"
   }
 }

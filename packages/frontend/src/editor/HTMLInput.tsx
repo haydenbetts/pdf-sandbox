@@ -38,6 +38,7 @@ const Editor = (props : EditorProps) => {
       showPrintMargin: false,
       showGutter: false,
       highlightActiveLine: false,
+      setAutoScrollEditorIntoView: true,
       height: '100vh',
       width: '100%',
       setOptions: {
