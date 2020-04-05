@@ -73,7 +73,7 @@ const Preview = ({ classes, html, css } : PreviewProps) => {
 
           ifr.contentDocument!.head.appendChild(style);
           style.type = 'text/css';
-          style.appendChild(ifr.contentDocument!.createTextNode(css));
+          style.appendChild(ifr.contentDocument!.createTextNode(css + 'body { -webkit-print-color-adjust:exact; }'));
 
           var body = ifr.contentDocument!.createElement("body");
           body.innerHTML = html;

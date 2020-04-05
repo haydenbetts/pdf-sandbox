@@ -73,7 +73,12 @@ class RunningHeaders extends Handler {
 	afterParsed(fragment) {
 		for (let name of Object.keys(this.runningSelectors)) {
 			let set = this.runningSelectors[name];
-			let selected = Array.from(fragment.querySelectorAll(set.selector));
+			let selected = [];
+			try {
+				selected = Array.from(fragment.querySelectorAll(set.selector));
+			} catch(err) {
+				console.error(err);
+			}
 
 			if (set.identifier === "running") {
 				for (let header of selected) {

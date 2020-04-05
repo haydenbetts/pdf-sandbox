@@ -8,6 +8,7 @@ import Header from './Header';
 import Sidebar from './sidebar'
 import Editor from './editor';
 import Preview from './preview'
+import SplitPane from './components/SplitPane';
 
 const styles = (theme: any) => 
   createStyles({
@@ -15,13 +16,6 @@ const styles = (theme: any) =>
         width: '100%',
         height: 50,
         backgroundColor: theme.palette.grey.one
-    },
-    dragger: {
-        height: '100%',
-        cursor: 'ew-resize',
-        width: '15px',
-        backgroundColor: '#ffffff4d',
-        boxShadow: 'inset 0px -8px 2px 0px hsla(0, 0%, 0%, .1)'
     },
     spacer: {
         height: '40px',
@@ -72,16 +66,16 @@ const Layout = ({classes}: LayoutProps) => {
         console.log('sanitizeHtml(html)', sanitizeHtml(html, {
             allowedTags: [ 'h3', 'h4', 'h5', 'h6', 'blockquote', 'p', 'a', 'ul', 'ol',
             'nl', 'li', 'b', 'i', 'strong', 'em', 'strike', 'code', 'hr', 'br', 'div',
-            'table', 'thead', 'caption', 'tbody', 'tr', 'th', 'td', 'pre', 'iframe', 'img', 'table', 'link' ],
+            'table', 'thead', 'caption', 'tbody', 'tr', 'th', 'td', 'pre', 'iframe', 'img', 'table', 'link', 'span' ],
             allowedAttributes: {
                 div: ['class'],
                 img: ['href']
             }
         }))
         setState({...state, html: sanitizeHtml(html, {
-            allowedTags: [ 'h3', 'h4', 'h5', 'h6', 'blockquote', 'p', 'a', 'ul', 'ol',
+            allowedTags: [ 'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'blockquote', 'p', 'a', 'ul', 'ol',
             'nl', 'li', 'b', 'i', 'strong', 'em', 'strike', 'code', 'hr', 'br', 'div',
-            'table', 'thead', 'caption', 'tbody', 'tr', 'th', 'td', 'pre', 'iframe', 'img', 'link' ],
+            'table', 'thead', 'caption', 'tbody', 'tr', 'th', 'td', 'pre', 'iframe', 'img', 'link', 'svg' , 'span'],
             allowedAttributes: {
                 img: ['href', 'src'],
                 '*': [ 'style', 'class', 'align', 'alt', 'center', 'bgcolor', 'href' ]
@@ -123,20 +117,16 @@ const Layout = ({classes}: LayoutProps) => {
             <Header name={state.name}/>
             <Grid id="outside" container direction="row" style={{flexWrap: 'nowrap'}}>
                 <Sidebar></Sidebar>
-                    <Grid item style={{width: `${state.width || 50}%`}}>
-                    <Editor setHTML={setHTML} setCSS={setCSS} parentState={state}/>
-                    </Grid>
-                    <div style={{position: 'relative'}}>
-                    <Draggable position={{x: 0, y: 0}} onStart={dragHandlers.onStart} onStop={dragHandlers.onStop} axis="x" onDrag={dragHandlers.handleDrag}>
-                        <div style={{position: 'absolute', opacity: 0, width: 15, height: '100%',  cursor: 'ew-resize'}}>
-                        </div>
-                    </Draggable>
-                         <div className={classes.spacer} ></div>
-                        <div className={classes.dragger}></div>
+                    <div style={{position: 'relative', width: '100%'}}>
+                        <SplitPane vertical={false} className="test" onResize={() => {}}>
+                            <Grid item>
+                                <Editor setHTML={setHTML} setCSS={setCSS} parentState={state}/>
+                            </Grid>
+                            <Grid item style={{overflow: 'scroll'}}>
+                                <Preview html={state.html} css={state.css}/>
+                            </Grid>
+                        </SplitPane>
                     </div>
-                    <Grid item style={{width: `${100 - state.width || 50}%`, overflow: 'scroll'}}>
-                        <Preview html={state.html} css={state.css}/>
-                    </Grid>
             </Grid>
         </div>
     )

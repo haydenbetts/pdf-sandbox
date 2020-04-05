@@ -151,7 +151,11 @@ class Chunker {
 
 		this.emit("rendering", content);
 
-		await this.hooks.afterParsed.trigger(parsed, this);
+		try {
+			await this.hooks.afterParsed.trigger(parsed, this);
+		} catch(err) {
+			console.error(err);
+		}
 
 		await this.loadFonts();
 
