@@ -1,9 +1,11 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { createStyles, withStyles } from '@material-ui/core/styles';
 import {Grid, IconButton, Box} from '@material-ui/core';
+import { createPortal } from 'react-dom';
 import PictureAsPdf from '@material-ui/icons/PictureAsPdf';
 import GetApp from '@material-ui/icons/GetApp';
-import * as Paged from '@pdf-sandbox/paged-js';
+// import * as Paged from '@pdf-sandbox/paged-js';
+import PreviewFrame from '@pdf-sandbox/preview';
 
 import Tab from '../components/Tab';
 
@@ -34,11 +36,33 @@ const styles = (theme: any) =>
       css: string;
   }
 
-let paged = new Paged.Previewer();
+// let paged = new Paged.Previewer();
 
 enum Tabs {
   pdf = 'pdf',
 }
+
+class Frame extends React.Component {
+  iframeHead: any;
+  iframeRoot: any;
+  node: any;
+
+  componentDidMount() {
+    this.iframeHead = this.node.contentDocument.head
+    this.iframeRoot = this.node.contentDocument.body
+    this.forceUpdate()
+  }
+
+  render() {
+    const { children, ...rest } = this.props
+    return (
+      <iframe {...rest} ref={node => (this.node = node)} style={{width: '100%', height: '100vh', transform: 'translate(0px, 50px)' }}>
+        {this.iframeRoot && createPortal(children, this.iframeRoot)}
+      </iframe>
+    )
+  }
+}
+
 
 const Preview = ({ classes, html, css } : PreviewProps) => {
 
@@ -85,29 +109,29 @@ const Preview = ({ classes, html, css } : PreviewProps) => {
 
           document.body.removeChild(ifr);
         }
-   useEffect(() => {
-        if (preview.current && paged) {
-            if (paged.polisher) {
-              paged.polisher.destroy();
-              paged.polisher = new Paged.Polisher(false);
-            }
+  //  useEffect(() => {
+  //       if (preview.current && paged) {
+  //           if (paged.polisher) {
+  //             paged.polisher.destroy();
+  //             paged.polisher = new Paged.Polisher(false);
+  //           }
 
-            const placeholder = document.createElement('div');
-            placeholder.innerHTML = html;
-            let flow = paged.preview(placeholder, css, preview.current).then((flow: any) => {
-              const container = document.querySelector('.pagedjs_pages');
-              if (container) {
-                (container as any).style.transformOrigin = 'top';
-                (container as any).style.transform = 'scale(.5) translate(0px, 100px)';
-              }
-              const pages = Array.from(document.querySelectorAll('.pagedjs_page'));
-              pages.forEach((page) => {
-                (page as any).style.backgroundColor = '#fdfdfd';
-                (page as any).style.marginBottom = '16px';
-              })
-            }).catch((err: any) => console.error(err))
-        }
-    }, [html, css])
+  //           const placeholder = document.createElement('div');
+  //           placeholder.innerHTML = html;
+  //           let flow = paged.preview(placeholder, css, preview.current).then((flow: any) => {
+  //             const container = document.querySelector('.pagedjs_pages');
+  //             if (container) {
+  //               (container as any).style.transformOrigin = 'top';
+  //               (container as any).style.transform = 'scale(.5) translate(0px, 100px)';
+  //             }
+  //             const pages = Array.from(document.querySelectorAll('.pagedjs_page'));
+  //             pages.forEach((page) => {
+  //               (page as any).style.backgroundColor = '#fdfdfd';
+  //               (page as any).style.marginBottom = '16px';
+  //             })
+  //           }).catch((err: any) => console.error(err))
+  //       }
+  //   }, [html, css])
     
   return (
     <div className={classes.bg}>
@@ -129,7 +153,7 @@ const Preview = ({ classes, html, css } : PreviewProps) => {
           </Box>
         </Grid>
       </Grid>
-     <div ref={preview}></div>
+       <PreviewFrame html={html} css={css}/>
    </div>
   )
 }
