@@ -2,6 +2,8 @@ import React from 'react';
 import { Grid, Typography, Box } from '@material-ui/core';
 import { createStyles, withStyles } from '@material-ui/core/styles';
 import PictureAsPdf from '@material-ui/icons/PictureAsPdf';
+import { createPDF } from './redux/actions/pdfs';
+import { connect } from 'react-redux';
 import Save from '@material-ui/icons/Save';
 import GetAppIcon from '@material-ui/icons/GetApp';
 
@@ -27,9 +29,13 @@ const styles = (theme: any) =>
 type HeaderProps = {
     classes: any,
     name: string;
+    createPDF: () => void
 }
 
-const Header = ({classes, name}: HeaderProps) => {
+const Header = ({classes, name, createPDF}: HeaderProps) => {
+    const handleSave = () => {
+        createPDF();
+    }
     return (
         <>
             <header className={classes.header}>
@@ -43,7 +49,7 @@ const Header = ({classes, name}: HeaderProps) => {
                      <Save className={classes.headerIcon} fontSize="small"/>
                     </Box>
                     <Box mr={1}>
-                    <Typography variant="subtitle2" className={classes.text}>Save</Typography>
+                    <Typography variant="subtitle2" className={classes.text} style={{cursor: 'pointer'}} onClick={handleSave}>Save</Typography>
                     </Box>
                     <Box mr={1}>
                         <GetAppIcon className={classes.headerIcon} fontSize="small"/>
@@ -55,4 +61,4 @@ const Header = ({classes, name}: HeaderProps) => {
     )
 }
 
-export default withStyles(styles, { withTheme: true })(Header);;
+export default withStyles(styles, { withTheme: true })(connect(null, { createPDF })(Header));

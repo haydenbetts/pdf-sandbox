@@ -1,0 +1,3 @@
+export const CREATE_PDF_SUCCESS = 'CREATE_PDF_SUCCESS';
+export const CREATE_PDF_FAIL = 'CREATE_PDF_FAIL';
+export const CREATE_PDF = 'CREATE_PDF';
