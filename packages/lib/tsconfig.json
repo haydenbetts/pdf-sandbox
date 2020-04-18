@@ -1,0 +1,21 @@
+{
+    "compilerOptions": {
+      "rootDir": "src",
+      "outDir": "build",
+      "esModuleInterop": true,
+      "allowSyntheticDefaultImports": true,
+      "strict": true,
+      "noFallthroughCasesInSwitch": true,
+      "noUnusedParameters": true,
+      "noImplicitReturns": true,
+      "moduleResolution": "node",
+      "noUnusedLocals": true,
+      "noImplicitAny": true,
+      "declaration": true,
+      "target": "es5",
+      "module": "esnext"
+    },
+    "include": ["src/**/*"],
+    "exclude": ["node_modules", "build"]
+  }
+  
