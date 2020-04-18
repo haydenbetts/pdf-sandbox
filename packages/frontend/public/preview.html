@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Preview</title>
+    <style>
+    :root {
+        --color-mbox : rgba(0,0,0,0.2);
+        --margin: 4px;
+    }
+    
+    [contenteditable]:focus {
+        outline: 0px solid transparent;
+    }
+    
+    #controls {
+        display: none;
+    }
+    
+    @media screen {
+    
+        body {
+        background-color: whitesmoke;
+        }
+    
+        .pagedjs_page {
+        background-color: #fdfdfd;
+        margin: calc(var(--margin) * 4) var(--margin);
+        flex: none;
+        box-shadow: 0 0 0 1px var(--color-mbox);
+        }
+    
+        .pagedjs_pages {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        flex-wrap: wrap;
+        justify-content: flex-start;
+        transform-origin: top;
+        transform: scale(.5) translate(100px, 0px);
+        margin: 0 auto;
+        }
+    
+        #controls {
+        margin: 20px 0;
+        text-align: center;
+        display: block;
+        }
+    
+        .pagedjs_first_page {
+        /* margin-left: calc(50% + var(--margin)); */
+        }
+    }
+    
+    @media screen {
+        .debug .pagedjs_margin-top .pagedjs_margin-top-left-corner,
+        .debug .pagedjs_margin-top .pagedjs_margin-top-right-corner {
+        box-shadow: 0 0 0 1px inset var(--color-mbox);
+        }
+    
+        .debug .pagedjs_margin-top > div {
+        box-shadow: 0 0 0 1px inset var(--color-mbox);
+        }
+    
+        .debug .pagedjs_margin-right > div {
+        box-shadow: 0 0 0 1px inset var(--color-mbox);
+        }
+    
+        .debug .pagedjs_margin-bottom .pagedjs_margin-bottom-left-corner,
+        .debug .pagedjs_margin-bottom .pagedjs_margin-bottom-right-corner {
+        box-shadow: 0 0 0 1px inset var(--color-mbox);
+        }
+    
+        .debug .pagedjs_margin-bottom > div {
+        box-shadow: 0 0 0 1px inset var(--color-mbox);
+        }
+    
+        .debug .pagedjs_margin-left > div {
+        box-shadow: 0 0 0 1px inset var(--color-mbox);
+        }
+    }
+    </style>
+    <script src="http://localhost:9090/dist/paged.js"></script>
+    <script>
+        var paged = new Paged.Previewer();
+        window.addEventListener("message", function(event) {
+            console.log('got the message');
+            try {
+                var d = JSON.parse(event.data);
+                var html = d.html;
+                var css = d.css;
+
+                if (paged.polisher) {
+                paged.polisher.destroy();
+                paged.polisher = new Paged.Polisher(false);
+                }
+
+                const placeholder = document.createElement('div');
+                placeholder.innerHTML = html;
+                    let flow = paged.preview(placeholder, css, document.getElementById('container')).then((flow) => {
+                    const container = document.querySelector('.pagedjs_pages');
+                    if (container) {
+                        container.style.transformOrigin = 'top';
+                        container.style.transform = 'scale(.5) translate(0px, 100px)';
+                    }
+                    const pages = Array.from(document.querySelectorAll('.pagedjs_page'));
+                    pages.forEach((page) => {
+                        page.style.backgroundColor = '#fdfdfd';
+                        page.style.marginBottom = '16px';
+                    })
+                })
+            } catch(err) {
+                console.error(err);
+            };
+        });
+        window.parent.postMessage('child_ready', '*');
+    </script>
+</head>
+<body>
+   <div id="container"></div> 
+</body>
+</html>

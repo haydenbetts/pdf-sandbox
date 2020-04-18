@@ -79,8 +79,6 @@ class Layout {
 				this.hooks && this.hooks.layout.trigger(wrapper, this);
 
 				let imgs = wrapper.querySelectorAll("img");
-				console.log("wrapper", wrapper);
-				console.log(">><>>>", imgs);
 				if (imgs.length) {
 					await this.waitForImages(imgs);
 				}

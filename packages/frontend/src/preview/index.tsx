@@ -1,9 +1,9 @@
 import React, { useState, useRef, useEffect } from 'react';
+import ReactDOM from 'react-dom';
 import { createStyles, withStyles } from '@material-ui/core/styles';
-import {Grid, IconButton, Box} from '@material-ui/core';
+import {Grid, IconButton, Box, CircularProgress} from '@material-ui/core';
 import PictureAsPdf from '@material-ui/icons/PictureAsPdf';
 import GetApp from '@material-ui/icons/GetApp';
-import * as Paged from '@pdf-sandbox/paged-js';
 
 import Tab from '../components/Tab';
 
@@ -34,11 +34,13 @@ const styles = (theme: any) =>
       css: string;
   }
 
-let paged = new Paged.Previewer();
-
 enum Tabs {
   pdf = 'pdf',
 }
+
+// const Outsider = () => (
+//   ReactDOM.createPortal(document.getElementById('preview-container'), document.body)
+// )
 
 const Preview = ({ classes, html, css } : PreviewProps) => {
 
@@ -53,6 +55,7 @@ const Preview = ({ classes, html, css } : PreviewProps) => {
       }
     }
   })
+  const [loading, setLoading] = useState(true);
 
   const preview = useRef(null);
 
@@ -85,28 +88,9 @@ const Preview = ({ classes, html, css } : PreviewProps) => {
 
           document.body.removeChild(ifr);
         }
-   useEffect(() => {
-        if (preview.current && paged) {
-            if (paged.polisher) {
-              paged.polisher.destroy();
-              paged.polisher = new Paged.Polisher(false);
-            }
 
-            const placeholder = document.createElement('div');
-            placeholder.innerHTML = html;
-            let flow = paged.preview(placeholder, css, preview.current).then((flow: any) => {
-              const container = document.querySelector('.pagedjs_pages');
-              if (container) {
-                (container as any).style.transformOrigin = 'top';
-                (container as any).style.transform = 'scale(.5) translate(0px, 100px)';
-              }
-              const pages = Array.from(document.querySelectorAll('.pagedjs_page'));
-              pages.forEach((page) => {
-                (page as any).style.backgroundColor = '#fdfdfd';
-                (page as any).style.marginBottom = '16px';
-              })
-            }).catch((err: any) => console.error(err))
-        }
+    useEffect(() => {
+      (window as any).frames[0].postMessage(JSON.stringify({ html , css }), '*');
     }, [html, css])
     
   return (
@@ -128,8 +112,20 @@ const Preview = ({ classes, html, css } : PreviewProps) => {
           </IconButton>
           </Box>
         </Grid>
+        <div style={{height: '100vh', visibility: loading ? 'hidden' : 'visible'}} ref={(ref) => {
+          var preview = document.getElementById('preview-container');
+          if (!ref || !preview || ref.contains(preview)) return;
+          preview.style.width = '100%';
+          preview.style.height = '100%';
+          ref.appendChild(preview);
+          window.addEventListener('message', (event) => {
+            if (event.data === 'child_ready') {
+              (window as any).frames[0].postMessage(JSON.stringify({ html , css }), '*');
+              setLoading(false);
+            }
+          })
+      }}></div>
       </Grid>
-     <div ref={preview}></div>
    </div>
   )
 }

@@ -40,7 +40,8 @@ export function *walk(start, limiter) {
 
 export function nodeAfter(node, limiter) {
 	let after = node;
-
+	if (!after) return after;
+	
 	if (after.nextSibling) {
 		if (limiter && node === limiter) {
 			return;

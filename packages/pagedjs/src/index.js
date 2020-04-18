@@ -4,9 +4,6 @@ import Previewer from "./polyfill/previewer";
 import Handler from "./modules/handler";
 import { registerHandlers, initializeHandlers } from "./utils/handlers";
 
-console.log('here')
-console.trace()
-
 export {
 	Chunker,
 	Polisher,
