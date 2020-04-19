@@ -8,8 +8,6 @@ import * as colors from './lib/colors';
 
 const primary = colors.compute('#85ACD6')
 
-console.log('primary', primary)
-
 type ThemeProps = {
   children: ReactNode;
 };

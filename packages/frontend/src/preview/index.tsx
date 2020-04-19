@@ -1,6 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import ReactDOM from 'react-dom';
 import { createStyles, withStyles } from '@material-ui/core/styles';
+import { connect } from 'react-redux';
 import {Grid, IconButton, Box, CircularProgress} from '@material-ui/core';
 import PictureAsPdf from '@material-ui/icons/PictureAsPdf';
 import GetApp from '@material-ui/icons/GetApp';
@@ -90,6 +91,8 @@ const Preview = ({ classes, html, css } : PreviewProps) => {
         }
 
     useEffect(() => {
+      if (!(window as any).frames) return;
+      if (!(window as any).frames[0]) return;
       (window as any).frames[0].postMessage(JSON.stringify({ html , css }), '*');
     }, [html, css])
     
@@ -129,5 +132,6 @@ const Preview = ({ classes, html, css } : PreviewProps) => {
    </div>
   )
 }
+const mapStateToProps = (props: any) => ({ html: props.pdfs.html, css: props.pdfs.css })
 
-  export default withStyles(styles, { withTheme: true })(Preview);;
+  export default withStyles(styles, { withTheme: true })(connect(mapStateToProps, null)(Preview))

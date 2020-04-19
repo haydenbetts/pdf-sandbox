@@ -1,40 +1,41 @@
 import React from 'react';
-import { Grid, Typography, Box } from '@material-ui/core';
-import { createStyles, withStyles } from '@material-ui/core/styles';
+import { Grid, Typography, Box, CircularProgress } from '@material-ui/core';
+import { createStyles, withStyles, Theme } from '@material-ui/core/styles';
 import PictureAsPdf from '@material-ui/icons/PictureAsPdf';
-import { createPDF } from './redux/actions/pdfs';
+import { savePDF } from './redux/actions/pdfs';
 import { connect } from 'react-redux';
 import Save from '@material-ui/icons/Save';
 import GetAppIcon from '@material-ui/icons/GetApp';
 
-const styles = (theme: any) => 
+const styles = (theme: Theme) => 
   createStyles({
     header: {
         width: '100%',
         height: 50,
-        backgroundColor: theme.palette.grey.one
+        backgroundColor: (theme as any).palette.grey.one
     },
     headerIcon: {
-        color: theme.palette.grey.three,
+        color: (theme as any).palette.grey.three,
         '&:hover': {
             transition: 'background-color .2s',
-            color: theme.palette.grey.three
+            color: (theme as any).palette.grey.three
         }
     },
     text: {
-        color: theme.palette.grey.three
+        color: (theme as any).palette.grey.three
     }
   });
 
 type HeaderProps = {
     classes: any,
-    name: string;
-    createPDF: () => void
+    name: any;
+    saving: boolean;
+    savePDF: () => void;
 }
 
-const Header = ({classes, name, createPDF}: HeaderProps) => {
+const Header = ({classes = {}, name, savePDF, saving}: HeaderProps) => {
     const handleSave = () => {
-        createPDF();
+        savePDF();
     }
     return (
         <>
@@ -46,7 +47,12 @@ const Header = ({classes, name, createPDF}: HeaderProps) => {
                     </Box>
                     <Box mr={2}> </Box>
                     <Box mr={1}>
-                     <Save className={classes.headerIcon} fontSize="small"/>
+                        {saving ? 
+                        (
+                            <CircularProgress size={10}/>
+                        ) : (
+                            <Save className={classes.headerIcon} fontSize="small"/>
+                        )}
                     </Box>
                     <Box mr={1}>
                     <Typography variant="subtitle2" className={classes.text} style={{cursor: 'pointer'}} onClick={handleSave}>Save</Typography>
@@ -61,4 +67,6 @@ const Header = ({classes, name, createPDF}: HeaderProps) => {
     )
 }
 
-export default withStyles(styles, { withTheme: true })(connect(null, { createPDF })(Header));
+export const mapStateToProps  = (props: any) => ({saving: props.pdfs.saving})
+
+export default withStyles(styles, { withTheme: true })(connect(mapStateToProps, { savePDF })(Header))

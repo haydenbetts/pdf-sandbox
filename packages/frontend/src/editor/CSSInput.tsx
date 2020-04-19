@@ -1,8 +1,10 @@
 import React, { useState, useEffect} from 'react';
 import ReactEditor from "react-ace"
+import js_beautify from 'js-beautify';
 
 import "ace-builds/src-noconflict/mode-css";
-import "ace-builds/src-noconflict/theme-github";
+import "ace-builds/src-noconflict/theme-eclipse";
+
 
 import UseDebounce from '../hooks/UseDebounce';
 
@@ -12,31 +14,27 @@ type CSSProps = {
 }
 
 const Editor = (props : CSSProps) => {
-  
-  const [state, setState] = useState(props.css);
-  const debouncedState = UseDebounce(state, 500);
-
-  useEffect(() => {
-    props.setCSS(state);
-  }, [debouncedState])
 
     const editorProps = {
       mode: 'css',
-      value: state,
-      theme: "github",
-      onChange: (val: string) => setState(val),
+      value: props.css,
+      theme: 'eclipse',
+      onChange: (val: string) => props.setCSS((val)),
       name: 'id',
-      fontSize: 12,
+      fontSize: 13,
+      showPrintMargin: false,
+      showGutter: true,
+      highlightActiveLine: true,
+      setAutoScrollEditorIntoView: true,
       height: '100vh',
       width: '100%',
-      showPrintMargin: false,
-      showGutter: false,
-      setAutoScrollEditorIntoView: true,
-      highlightActiveLine: false,
       setOptions: {
-        showLineNumbers: false,
-        tabSize: 2,
-        useWorker: false
+        showLineNumbers: true,
+        highlightActiveLine: true,
+        enableBasicAutocompletion: true,
+        tabSize: 4,
+        useWorker: false,
+        displayIndentGuides: true
       },
       editorProps: {
         $blockScrolling: true
@@ -44,9 +42,16 @@ const Editor = (props : CSSProps) => {
     };
   
     return (
+      <>
         <div >
            <ReactEditor {...editorProps} />
         </div>
+        <style>
+           {`.ace_editor {
+             font-family: 'Source Code Pro', monospace !important;,
+           }`}
+        </style>
+      </>
     );
   }
   
