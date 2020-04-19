@@ -74,7 +74,7 @@ export const savePDF = newPDF => async (dispatch, getState) => {
         })
         const pdf = await ref.get();
         dispatch(fetchPDFSuccess(pdf));
-        dispatch(push(`/${pdf.id}`));
+        window.location.assign(`/${pdf.id}`);
       } catch (err) {
         dispatch(createPDFFail())
       }
@@ -83,6 +83,7 @@ export const savePDF = newPDF => async (dispatch, getState) => {
         html,
         css
       })
-      dispatch(fetchPDFSuccess(pdf));
+      const updated = await pdf.ref.get();
+      dispatch(fetchPDFSuccess(updated));
     }
 };

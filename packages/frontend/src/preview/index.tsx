@@ -3,8 +3,9 @@ import ReactDOM from 'react-dom';
 import { createStyles, withStyles } from '@material-ui/core/styles';
 import { connect } from 'react-redux';
 import {Grid, IconButton, Box, CircularProgress} from '@material-ui/core';
-import PictureAsPdf from '@material-ui/icons/PictureAsPdf';
+import {PictureAsPdf, ZoomIn, ZoomOut} from '@material-ui/icons';
 import GetApp from '@material-ui/icons/GetApp';
+import { TransformWrapper, TransformComponent } from "react-zoom-pan-pinch";
 
 import Tab from '../components/Tab';
 
@@ -97,17 +98,30 @@ const Preview = ({ classes, html, css } : PreviewProps) => {
     }, [html, css])
     
   return (
+    <TransformWrapper
+    defaultScale={1}
+    defaultPositionX={200}
+    defaultPositionY={100}
+    pan={{
+      disabled: false,
+    }}
+  >
+{({ zoomIn, zoomOut, resetTransform, ...rest } : any) => (
     <div className={classes.bg}>
       <Grid className={classes.header}>
         <Tab active={state.tab === Tabs.pdf} name={state.files.pdf.name} tab={Tabs.pdf} onClick={() => {}} Icon={PictureAsPdf}/>
         <Grid className={classes.subhead} container alignItems="center" justify="space-between">
-          <Grid item container style={{width: 'unset'}}>
-          <Box ml={1}>
-          <input type="checkbox" id="scales" name="scales"checked={!state.settings.left_right} />
-          </Box>
-          <Box ml={1}>
-             Left/Right Pages
-          </Box>
+          <Grid container xs={3}>
+            <Grid item container style={{width: 'unset'}}>
+            <IconButton onClick={zoomIn} size="small">
+              <ZoomIn fontSize="small"/>
+            </IconButton>
+            </Grid>
+            <Grid item container style={{width: 'unset'}}>
+            <IconButton onClick={zoomOut} size="small">
+              <ZoomOut fontSize="small"/>
+            </IconButton>
+            </Grid>
           </Grid>
           <Box mr={2}>
           <IconButton onClick={() => print()} size="small">
@@ -115,7 +129,8 @@ const Preview = ({ classes, html, css } : PreviewProps) => {
           </IconButton>
           </Box>
         </Grid>
-        <div style={{height: '100vh', visibility: loading ? 'hidden' : 'visible'}} ref={(ref) => {
+        <TransformComponent>
+        <div style={{height: '100vh', visibility: loading ? 'hidden' : 'visible', width: '100%'}} ref={(ref) => {
           var preview = document.getElementById('preview-container');
           if (!ref || !preview || ref.contains(preview)) return;
           preview.style.width = '100%';
@@ -128,10 +143,22 @@ const Preview = ({ classes, html, css } : PreviewProps) => {
             }
           })
       }}></div>
+              </TransformComponent>
       </Grid>
+      <style>
+        {`
+        .react-transform-element {
+          width: 100%;
+        }
+        .react-transform-component {
+          width: 100%;
+        }
+        `}
+      </style>
    </div>
-  )
-}
+     )}
+  </TransformWrapper>
+  )}
 const mapStateToProps = (props: any) => ({ html: props.pdfs.html, css: props.pdfs.css })
 
   export default withStyles(styles, { withTheme: true })(connect(mapStateToProps, null)(Preview))
