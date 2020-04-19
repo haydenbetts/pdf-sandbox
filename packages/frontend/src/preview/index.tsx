@@ -63,6 +63,7 @@ const Preview = ({ classes, html, css, json, filenames } : PreviewProps) => {
       var template = handlebars.compile(html);
       return template(JSON.parse(json));
     } catch(err) {
+      console.error('err', err);
       return html;
     }
   }
@@ -79,7 +80,7 @@ const Preview = ({ classes, html, css, json, filenames } : PreviewProps) => {
            var scr = ifr.contentDocument!.createElement("script");
         
           scr.type = "text/javascript";
-          scr.src = 'https://unpkg.com/pagedjs/dist/paged.polyfill.js'; // Use the IP       found above
+          scr.src = 'http://localhost:9090/dist/paged.polyfill.js'; // Use the IP       found above
           ifr!.contentDocument!.head.appendChild(scr);
 
           var style = ifr.contentDocument!.createElement("style");
@@ -89,11 +90,11 @@ const Preview = ({ classes, html, css, json, filenames } : PreviewProps) => {
           style.appendChild(ifr.contentDocument!.createTextNode(css + 'body { -webkit-print-color-adjust:exact; }'));
 
           var body = ifr.contentDocument!.createElement("body");
-          body.innerHTML = html;
+          body.innerHTML = mergeHTMLJSON();
 
           ifr.contentDocument!.body = body;
 
-          await new Promise ((resolve) => setTimeout(resolve, 500));
+          await new Promise ((resolve) => setTimeout(resolve, 2000));
           ifr!.contentWindow!.print();
 
           document.body.removeChild(ifr);

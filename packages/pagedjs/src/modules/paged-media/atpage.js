@@ -1555,8 +1555,12 @@ class AtPage extends Handler {
 
 			let content;
 			if (page.element.matches(sels[0]) && margin.hasContent) {
-				content = page.element.querySelector(sels[1]);
-				content.classList.add("hasContent");
+				try {
+					content = page.element.querySelector(sels[1]);
+					content.classList.add("hasContent");
+				} catch(err) {
+					console.error(err);
+				}
 			}
 		}
 
