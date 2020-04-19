@@ -4,7 +4,10 @@ import Grid from '@material-ui/core/Grid';
 import Box from '@material-ui/core/Box';
 import Typography from '@material-ui/core/Typography';
 import Code from '@material-ui/icons/Code';
+import sanitizeHtml from 'sanitize-html';
+import { connect } from 'react-redux';
 
+import { setHTML, setCSS } from '../redux/actions/pdfs';
 import HTMLInput from './HTMLInput';
 import CSSInput from './CSSInput';
 import Tab from '../components/Tab';
@@ -22,9 +25,10 @@ const styles = (theme: any) =>
 
 type EditorProps = {
     classes: any;
-    setCSS: Function
-    setHTML: Function;
-    parentState: any;
+    setCSS: () => void;
+    setHTML: () => void;
+    html: string;
+    css: string;
 }
 
 enum Tabs {
@@ -32,8 +36,7 @@ enum Tabs {
     css = 'css'
 }
 
-
-const Editor = ({ classes, setCSS, setHTML, parentState } : EditorProps) => {
+const Editor = ({ classes, setCSS, setHTML, html, css } : EditorProps) => {
 
     const [state, setState] = useState({
         tab: Tabs.html,
@@ -63,13 +66,14 @@ const Editor = ({ classes, setCSS, setHTML, parentState } : EditorProps) => {
             </Grid>
             <div style={{maxHeight: '90vh', overflow: 'scroll'}}>
                 {state.tab === Tabs.html ? (
-                    <HTMLInput html={parentState.html} setHTML={setHTML}/>
+                    <HTMLInput html={html} setHTML={setHTML}/>
                 ) : (
-                    <CSSInput css={parentState.css} setCSS={setCSS}/>
+                    <CSSInput css={css} setCSS={setCSS}/>
                 )}
             </div>
         </div>
     )
   }
+  const mapStateToProps = (props: any) => ({ html: props.pdfs.html, css: props.pdfs.css })
 
-  export default withStyles(styles, { withTheme: true })(Editor);;
+  export default withStyles(styles, { withTheme: true })(connect(mapStateToProps, { setHTML, setCSS })(Editor));

@@ -1,19 +1,26 @@
 import React from 'react';
+import { Provider } from 'react-redux';
+
 import logo from './logo.svg';
 import './App.css';
-import { BrowserRouter as Router, Route } from 'react-router-dom';
+import { Route } from 'react-router';
+import { ConnectedRouter } from 'connected-react-router'
 import Theme from './Theme';
 import Layout from './Layout';
+import { store } from './index';
+import { history } from './history';
 
 function App() {
   return (
-
     <div className="App">
-      <Theme>
-        <Router>
-          <Route exact path = "/" component={Layout} />
-        </Router>
-      </Theme>
+      <Provider store={store}>
+        <Theme>
+          <ConnectedRouter history={history}>
+            <Route exact path = "/" component={Layout} />
+            <Route path = "/:id" component={Layout} />
+          </ConnectedRouter>
+        </Theme>
+      </Provider>
     </div>
   );
 }

@@ -92,7 +92,6 @@ class Polisher {
 
 	async convertViaSheet(cssStr, href) {
 		let sheet = new Sheet(href, this.hooks);
-		console.log("CSSSTRRRRR", cssStr);
 		await sheet.parse(cssStr);
 
 		// Insert the imported sheets first
@@ -116,7 +115,6 @@ class Polisher {
 			this.orientation = sheet.orientation;
 		}
 
-		console.log(sheet.toString());
 		return sheet.toString();
 	}
 

@@ -527,7 +527,6 @@ class AtPage extends Handler {
 		return padding;
 	}
 	addPageClasses(pages, ast, sheet) {
-		console.log("pages", pages);
 		// First add * page
 		if ("*" in pages) {
 			let p = this.createPage(pages["*"], ast.children, sheet);

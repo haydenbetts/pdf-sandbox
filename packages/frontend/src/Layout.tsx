@@ -1,14 +1,18 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { createStyles, withStyles } from '@material-ui/core/styles';
+import { matchPath } from 'react-router';
+import { RouterState } from 'connected-react-router';
 import Grid from '@material-ui/core/Grid';
-import sanitizeHtml from 'sanitize-html';
-import Draggable from "react-draggable";
+import { fetchPDF } from './redux/actions/pdfs';
+import { connect } from 'react-redux';
+
 
 import Header from './Header';
 import Sidebar from './sidebar'
 import Editor from './editor';
 import Preview from './preview'
 import SplitPane from './components/SplitPane';
+import { CircularProgress, StepIconClasskey } from '@material-ui/core';
 
 const styles = (theme: any) => 
   createStyles({
@@ -24,7 +28,10 @@ const styles = (theme: any) =>
   });
 
 type LayoutProps = {
-    classes: any
+    classes: any;
+    pathname: string;
+    fetching: boolean;
+    fetchPDF: (id: string) => void;
 }
 
 const dCSS = `
@@ -48,69 +55,30 @@ const dHTML =
 `
 
 
-const Layout = ({classes}: LayoutProps) => {
+const Layout = ({classes, pathname, fetching, fetchPDF}: LayoutProps) => {
     const persisted = localStorage.getItem('state');
-    console.log('persisted', persisted)
     const [state, setState] = useState(persisted ? JSON.parse(persisted) : {
         name: 'Untitled PDF',
-        html: dHTML,
-        css: dCSS,
         width: 50,
-        activeDrags: 0
     })
-    const [deltaPosition, setDeltaPosition] = useState({
-        x: 0, y: 0
-    });
-
-    const setHTML = (html: string) => {
-        console.log('sanitizeHtml(html)', sanitizeHtml(html, {
-            allowedTags: [ 'h3', 'h4', 'h5', 'h6', 'blockquote', 'p', 'a', 'ul', 'ol',
-            'nl', 'li', 'b', 'i', 'strong', 'em', 'strike', 'code', 'hr', 'br', 'div',
-            'table', 'thead', 'caption', 'tbody', 'tr', 'th', 'td', 'pre', 'iframe', 'img', 'table', 'link', 'span' ],
-            allowedAttributes: {
-                div: ['class'],
-                img: ['href']
-            }
-        }))
-        setState({...state, html: sanitizeHtml(html, {
-            allowedTags: [ 'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'blockquote', 'p', 'a', 'ul', 'ol',
-            'nl', 'li', 'b', 'i', 'strong', 'em', 'strike', 'code', 'hr', 'br', 'div',
-            'table', 'thead', 'caption', 'tbody', 'tr', 'th', 'td', 'pre', 'iframe', 'img', 'link', 'svg' , 'span'],
-            allowedAttributes: {
-                img: ['href', 'src'],
-                '*': [ 'style', 'class', 'align', 'alt', 'center', 'bgcolor', 'href' ]
-            }
-        })});
-    }
-
-    const setCSS = (css: string) => {
-        console.log('css', css)
-        setState({...state, css: sanitizeHtml(css)});
-    }
-
-    const draggableExtent = useRef(null);
-
-    const dragHandlers = {
-        onStart: () => setState({...state, activeDrags: ++state.activeDrags}), 
-        onStop: () => setState({...state, activeDrags: --state.activeDrags}),
-        handleDrag: (e: any, ui: any) => {
-            console.log(state.width)
-            let inital = state.width + (ui.deltaX / 50);
-            if (inital < 20) inital = 20;
-            if (inital > 80) inital = 80;
-            setState({...state, width: inital})
-            // console.log('x', x);
-            setDeltaPosition({
-                x: 0,
-                y: 0
-              });
-        }
-    };
-
 
     useEffect(() => {
-        localStorage.setItem('state', JSON.stringify(state));
-    }, [state])
+        type RouteParams = { params: { id?: string }};
+        const {
+            params
+          } : RouteParams = matchPath(pathname, {
+            path: '/:id',
+            exact: true,
+            strict: false
+          }) || { params: {} };
+
+          if (params.id) {
+              console.log('about to fetch', params.id);
+            fetchPDF(params.id);
+          }
+    }, []);
+
+    console.log('feetching', fetching)
 
     return (
         <div style={{maxHeight: '100vh', overflow: 'hidden'}}>
@@ -118,12 +86,13 @@ const Layout = ({classes}: LayoutProps) => {
             <Grid id="outside" container direction="row" style={{flexWrap: 'nowrap'}}>
                 <Sidebar></Sidebar>
                     <div style={{position: 'relative', width: '100%'}}>
+                    {fetching && <CircularProgress />}
                         <SplitPane vertical={false} className="test" onResize={() => {}}>
                             <Grid item>
-                                <Editor setHTML={setHTML} setCSS={setCSS} parentState={state}/>
+                                <Editor />
                             </Grid>
                             <Grid item style={{overflow: 'scroll'}}>
-                                <Preview html={state.html} css={state.css}/>
+                                <Preview />
                             </Grid>
                         </SplitPane>
                     </div>
@@ -132,4 +101,9 @@ const Layout = ({classes}: LayoutProps) => {
     )
 }
 
-export default withStyles(styles, { withTheme: true })(Layout);;
+const mapStateToProps = (state: any) => ({
+    pathname: (state.router as RouterState).location.pathname,
+    fetching: (state.pdfs.fetching)
+});
+
+export default withStyles(styles, { withTheme: true })(connect(mapStateToProps, { fetchPDF })(Layout));

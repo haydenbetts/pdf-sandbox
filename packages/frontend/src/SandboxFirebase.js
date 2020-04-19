@@ -2,7 +2,7 @@ import firebase from 'firebase';
 import { Collections } from '@pdf-sandbox/lib';
 
 import 'firebase/storage';
-import FIREBASE_CONFIG from './config.firebase.js'
+import FIREBASE_CONFIG from './.config.firebase.js'
 
 const Firebase = firebase.initializeApp(FIREBASE_CONFIG);
 
