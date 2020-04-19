@@ -1,5 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
 import ReactDOM from 'react-dom';
+import handlebars from 'handlebars';
 import { createStyles, withStyles } from '@material-ui/core/styles';
 import { connect } from 'react-redux';
 import {Grid, IconButton, Box, CircularProgress} from '@material-ui/core';
@@ -35,6 +36,7 @@ const styles = (theme: any) =>
       classes: any;
       html: string;
       css: string;
+      json: string;
       filenames: any
   }
 
@@ -46,7 +48,7 @@ enum Tabs {
 //   ReactDOM.createPortal(document.getElementById('preview-container'), document.body)
 // )
 
-const Preview = ({ classes, html, css, filenames } : PreviewProps) => {
+const Preview = ({ classes, html, css, json, filenames } : PreviewProps) => {
 
   const [state, setState] = useState({
     tab: Tabs.pdf,
@@ -55,6 +57,15 @@ const Preview = ({ classes, html, css, filenames } : PreviewProps) => {
     }
   })
   const [loading, setLoading] = useState(true);
+
+  const mergeHTMLJSON = () => {
+    try {
+      var template = handlebars.compile(html);
+      return template(JSON.parse(json));
+    } catch(err) {
+      return html;
+    }
+  }
 
   const preview = useRef(null);
 
@@ -91,7 +102,10 @@ const Preview = ({ classes, html, css, filenames } : PreviewProps) => {
     useEffect(() => {
       if (!(window as any).frames) return;
       if (!(window as any).frames[0]) return;
-      (window as any).frames[0].postMessage(JSON.stringify({ html , css }), '*');
+
+
+      
+      (window as any).frames[0].postMessage(JSON.stringify({ html: mergeHTMLJSON(), css }), '*');
     }, [html, css])
     
   return (
@@ -156,6 +170,6 @@ const Preview = ({ classes, html, css, filenames } : PreviewProps) => {
      )}
   </TransformWrapper>
   )}
-const mapStateToProps = (props: any) => ({ html: props.pdfs.html, css: props.pdfs.css, filenames: props.pdfs.filenames })
+const mapStateToProps = (props: any) => ({ html: props.pdfs.html, css: props.pdfs.css, json: props.pdfs.json, filenames: props.pdfs.filenames })
 
 export default withStyles(styles, { withTheme: true })(connect(mapStateToProps, null)(Preview))

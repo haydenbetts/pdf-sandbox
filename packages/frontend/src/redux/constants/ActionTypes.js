@@ -8,4 +8,5 @@ export const FETCH_PDF_SUCCESS = 'FETCH_PDF_SUCESS';
 
 export const SET_HTML = 'SET_HTML';
 export const SET_CSS = 'SET_CSS';
+export const SET_JSON = 'SET_JSON';
 export const SET_NAME = 'SET_NAME';
