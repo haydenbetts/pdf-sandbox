@@ -58,7 +58,6 @@ const dHTML =
 const Layout = ({classes, pathname, fetching, fetchPDF}: LayoutProps) => {
     const persisted = localStorage.getItem('state');
     const [state, setState] = useState(persisted ? JSON.parse(persisted) : {
-        name: 'Untitled PDF',
         width: 50,
     })
 
@@ -82,7 +81,7 @@ const Layout = ({classes, pathname, fetching, fetchPDF}: LayoutProps) => {
 
     return (
         <div style={{maxHeight: '100vh', overflow: 'hidden'}}>
-            <Header name={state.name}/>
+            <Header />
             <Grid id="outside" container direction="row" style={{flexWrap: 'nowrap'}}>
                 <Sidebar></Sidebar>
                     <div style={{position: 'relative', width: '100%'}}>

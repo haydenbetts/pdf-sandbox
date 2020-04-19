@@ -21,7 +21,8 @@ const styles = (theme: any) =>
     bg: {
       backgroundColor: theme.palette.grey.one,
       overflow: 'scroll',
-      height: 3000
+      height: 3000,
+      cursor: 'move'
     },
     subhead: {
       height: 36,
@@ -34,6 +35,7 @@ const styles = (theme: any) =>
       classes: any;
       html: string;
       css: string;
+      filenames: any
   }
 
 enum Tabs {
@@ -44,17 +46,12 @@ enum Tabs {
 //   ReactDOM.createPortal(document.getElementById('preview-container'), document.body)
 // )
 
-const Preview = ({ classes, html, css } : PreviewProps) => {
+const Preview = ({ classes, html, css, filenames } : PreviewProps) => {
 
   const [state, setState] = useState({
     tab: Tabs.pdf,
     settings: {
       left_right: true
-    },
-    files: {
-      pdf: {
-        name: 'untitled.pdf'
-      }
     }
   })
   const [loading, setLoading] = useState(true);
@@ -109,7 +106,7 @@ const Preview = ({ classes, html, css } : PreviewProps) => {
 {({ zoomIn, zoomOut, resetTransform, ...rest } : any) => (
     <div className={classes.bg}>
       <Grid className={classes.header}>
-        <Tab active={state.tab === Tabs.pdf} name={state.files.pdf.name} tab={Tabs.pdf} onClick={() => {}} Icon={PictureAsPdf}/>
+        <Tab active={state.tab === Tabs.pdf} name={filenames.pdf} tab={Tabs.pdf} onClick={() => {}} Icon={PictureAsPdf}/>
         <Grid className={classes.subhead} container alignItems="center" justify="space-between">
           <Grid container xs={3}>
             <Grid item container style={{width: 'unset'}}>
@@ -159,6 +156,6 @@ const Preview = ({ classes, html, css } : PreviewProps) => {
      )}
   </TransformWrapper>
   )}
-const mapStateToProps = (props: any) => ({ html: props.pdfs.html, css: props.pdfs.css })
+const mapStateToProps = (props: any) => ({ html: props.pdfs.html, css: props.pdfs.css, filenames: props.pdfs.filenames })
 
-  export default withStyles(styles, { withTheme: true })(connect(mapStateToProps, null)(Preview))
+export default withStyles(styles, { withTheme: true })(connect(mapStateToProps, null)(Preview))
