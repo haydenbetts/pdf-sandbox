@@ -5,6 +5,7 @@ import beautify from 'js-beautify';
 import "ace-builds/src-noconflict/mode-html";
 import "ace-builds/src-noconflict/theme-eclipse";
 import "ace-builds/src-min-noconflict/ext-language_tools"
+import "ace-builds/src-min-noconflict/ext-searchbox"
 
 import prettier from "prettier/standalone";
 import parserHTML from "prettier/parser-html";

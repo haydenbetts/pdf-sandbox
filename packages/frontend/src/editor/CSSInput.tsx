@@ -1,12 +1,9 @@
-import React, { useState, useEffect} from 'react';
+import React from 'react';
 import ReactEditor from "react-ace"
-import js_beautify from 'js-beautify';
 
 import "ace-builds/src-noconflict/mode-css";
 import "ace-builds/src-noconflict/theme-eclipse";
-
-
-import UseDebounce from '../hooks/UseDebounce';
+import "ace-builds/src-min-noconflict/ext-searchbox"
 
 type CSSProps = {
     setCSS: Function,
