@@ -1,4 +1,4 @@
-import { CREATE_PDF, SET_HTML, SET_CSS, SET_CREATING_PDF, FETCH_PDF_SUCCESS, SET_FETCHING_PDF } from '../constants/ActionTypes';
+import { SET_HTML, SET_CSS, SET_CREATING_PDF, FETCH_PDF_SUCCESS, SET_FETCHING_PDF } from '../constants/ActionTypes';
 
 export default (state = {html: '', css: ''}, action) => {
 
