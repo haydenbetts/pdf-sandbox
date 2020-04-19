@@ -1,6 +1,6 @@
 import Firebase, { Collections} from '../../SandboxFirebase.js';
 import { nanoid } from 'nanoid'
-import { CREATE_PDF_SUCCESS, CREATE_PDF_FAIL, SET_HTML, SET_CSS, SET_CREATING_PDF, FETCH_PDF_SUCCESS, SET_FETCHING_PDF, SET_NAME} from '../constants/ActionTypes'
+import { CREATE_PDF_SUCCESS, CREATE_PDF_FAIL, SET_HTML, SET_CSS, SET_CREATING_PDF, FETCH_PDF_SUCCESS, SET_FETCHING_PDF, SET_NAME, SET_JSON} from '../constants/ActionTypes'
 import { push } from 'connected-react-router';
 import { matchPath } from 'react-router';
 
@@ -35,6 +35,11 @@ export const setCSS = (css) => ({
     payload: css
 })
 
+export const setJSON = (json) => ({
+  type: SET_JSON,
+  payload: json
+})
+
 export const setFetching = () => ({
   type: SET_FETCHING_PDF
 })
@@ -60,7 +65,7 @@ export const fetchPDF = id => async (dispatch, getState) => {
 export const savePDF = newPDF => async (dispatch, getState) => {
   dispatch(setSaving());
 
-  const { html, css, pdf, name } = getState().pdfs;
+  const { html, css, pdf, name, json } = getState().pdfs;
 
   const {
       params
@@ -76,7 +81,8 @@ export const savePDF = newPDF => async (dispatch, getState) => {
         await ref.set({
           html,
           css,
-          name
+          name,
+          json
         })
         const pdf = await ref.get();
         dispatch(fetchPDFSuccess(pdf));
@@ -88,7 +94,8 @@ export const savePDF = newPDF => async (dispatch, getState) => {
       await pdf.ref.update({
         html,
         css,
-        name
+        name,
+        json
       })
       const updated = await pdf.ref.get();
       dispatch(fetchPDFSuccess(updated));
