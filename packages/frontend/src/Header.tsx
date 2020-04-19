@@ -1,8 +1,8 @@
 import React from 'react';
-import { Grid, Typography, Box, CircularProgress } from '@material-ui/core';
+import { Grid, Typography, Box, CircularProgress, Button } from '@material-ui/core';
 import { createStyles, withStyles, Theme } from '@material-ui/core/styles';
-import PictureAsPdf from '@material-ui/icons/PictureAsPdf';
-import { savePDF } from './redux/actions/pdfs';
+import {ImageSearch, PictureAsPdf} from '@material-ui/icons';
+import { savePDF, setName } from './redux/actions/pdfs';
 import { connect } from 'react-redux';
 import Save from '@material-ui/icons/Save';
 import GetAppIcon from '@material-ui/icons/GetApp';
@@ -22,20 +22,39 @@ const styles = (theme: Theme) =>
         }
     },
     text: {
-        color: (theme as any).palette.grey.three
+        color: (theme as any).palette.grey.three,
+        textTransform: 'unset'
+    },
+    inputDefault: {
+        backgroundColor: 'unset',  
+        border: 'none',
+        fontSize: '0.875rem',
+        fontFamily: `"Roboto", "Helvetica", "Arial", sans-serif`,
+        fontWeight: 500,
+        lineHeight: 1.577,
+        letterSpacing: '0.00714em',
+        width: 100,
+        color: '#737373',
+        '&:focus': {
+            backgroundColor: '#fff'
+        }
     }
   });
 
 type HeaderProps = {
     classes: any,
-    name: any;
     saving: boolean;
     savePDF: () => void;
+    setName: (name: string) => void;
+    name: string;
 }
 
-const Header = ({classes = {}, name, savePDF, saving}: HeaderProps) => {
+const Header = ({classes = {}, name, savePDF, setName, saving}: HeaderProps) => {
     const handleSave = () => {
         savePDF();
+    }
+    const handleNameChange = (e: any) => {
+        setName(e.target.value);
     }
     return (
         <>
@@ -43,30 +62,39 @@ const Header = ({classes = {}, name, savePDF, saving}: HeaderProps) => {
                 <Grid container direction="row" style={{height: '100%', alignItems: 'center'}}>
                     <PictureAsPdf className={classes.headerIcon} style={{width: 50}}/>
                     <Box mr={1}>
-                        <Typography variant="subtitle1" className={classes.text}>{name}</Typography>
+                        <input value={name} onChange={handleNameChange} className={classes.inputDefault} />
                     </Box>
-                    <Box mr={2}> </Box>
                     <Box mr={1}>
-                        {saving ? 
+                        <Button onClick={handleSave} className={classes.text} startIcon={saving ? 
                         (
-                            <CircularProgress size={10}/>
+                            <CircularProgress size={15}/>
                         ) : (
-                            <Save className={classes.headerIcon} fontSize="small"/>
-                        )}
+                            <Save style={{transform: 'translate(0px, -1px)'}}/>
+                        )}>
+                            Save
+                        </Button>
                     </Box>
                     <Box mr={1}>
-                    <Typography variant="subtitle2" className={classes.text} style={{cursor: 'pointer'}} onClick={handleSave}>Save</Typography>
+                        <Button className={classes.text} startIcon={<GetAppIcon />}>
+                            Archive
+                        </Button>
                     </Box>
                     <Box mr={1}>
-                        <GetAppIcon className={classes.headerIcon} fontSize="small"/>
+                        <Button className={classes.text} startIcon={<ImageSearch  style={{transform: 'translate(0px, -1px)'}}/>}>
+                        Templates
+                        </Button>
                     </Box>
-                    <Typography variant="subtitle2" className={classes.text}>Archive</Typography>
                 </Grid>
             </header>
         </>
     )
 }
 
-export const mapStateToProps  = (props: any) => ({saving: props.pdfs.saving})
+export const mapStateToProps  = (props: any) => ({saving: props.pdfs.saving, name: props.pdfs.name})
 
-export default withStyles(styles, { withTheme: true })(connect(mapStateToProps, { savePDF })(Header))
+const mapDispatchToProps = (dispatch: any) => ({
+    setName: (name: string) => dispatch(setName(name)),
+    savePDF: () => dispatch(savePDF())
+})
+
+export default withStyles(styles, { withTheme: true })(connect(mapStateToProps, mapDispatchToProps)(Header))

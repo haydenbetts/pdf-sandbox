@@ -39,9 +39,9 @@ type SidebarProps = {
 
 const Sidebar = ({ classes } : SidebarProps) => {
     return <div className={classes.bar}>
-      <div className={classes.barButton}>
+      {/* <div className={classes.barButton}>
         <HelpOutlineIcon className={classes.barIcon}></HelpOutlineIcon>
-      </div>
+      </div> */}
     </div>
 }
 
